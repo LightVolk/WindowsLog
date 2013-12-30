@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -10,7 +11,8 @@ namespace WindowsLog
 
     interface ILog
     {
-         List<string> GetLogMessages();
+         IEnumerable<EventLogEntry> GetLogMessages();
+         IEnumerable<EventLogEntry> GetAllMessagesFromSource(String sourceName, IEnumerable<EventLogEntry> logs);
     }
 
     class WinLog:ILog
@@ -40,18 +42,24 @@ namespace WindowsLog
                 Console.WriteLine(ex.Message);
             }
         }
-        
-       
+
+        public IEnumerable<EventLogEntry> GetAllMessagesFromSource(String sourceName,IEnumerable<EventLogEntry> logs)
+        {
+            try
+            {
+                var filterLog = logs.Where(l => l.Source.Equals(sourceName)).ToList();
+                return filterLog;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            return new List<EventLogEntry>();
+        }
 
         public IEnumerable<EventLogEntry> GetLogMessages()
         {
-            List<EventLogEntry> log = new List<EventLogEntry>();
-            foreach (System.Diagnostics.EventLogEntry entry in _EventLog.Entries)
-            {            
-                log.Add(entry);
-                
-            }
-            return log;
+            return _EventLog.Entries.Cast<EventLogEntry>().ToList();
         }
     }
 }
