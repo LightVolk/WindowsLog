@@ -17,7 +17,7 @@ namespace WindowsLog
 
     class WinLog:ILog
     {
-        private EventLog _EventLog;
+        private readonly EventLog _EventLog;
 
         public WinLog(String logName)
         {
